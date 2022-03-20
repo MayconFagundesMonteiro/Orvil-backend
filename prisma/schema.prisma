@@ -9,3 +9,14 @@ datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
+
+model Livros{
+  id Int  @id @default(autoincrement())
+  capa String
+  titulo String
+  autor String
+  editora String?
+  ano DateTime
+  edicacao Int?
+  genero String
+}
