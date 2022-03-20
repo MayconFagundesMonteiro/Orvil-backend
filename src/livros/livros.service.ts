@@ -8,6 +8,8 @@ export class LivrosService {
   constructor(private readonly _prisma: PrismaService) { }
 
   create(data: CreateLivroDto) {
+    delete data?.id;
+    data.alugado = false;
     return this._prisma.livros.create({ data });
   }
 
@@ -24,6 +26,7 @@ export class LivrosService {
   async update(id: number, data: UpdateLivroDto) {
     delete data.id;
     const query = await this._prisma.livros.findUnique({ where: { id } });
+    data.alugado = query.alugado;
     if (!query) return null;
     return this._prisma.livros.update({
       where: { id },

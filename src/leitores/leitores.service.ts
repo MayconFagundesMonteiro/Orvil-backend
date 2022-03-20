@@ -8,6 +8,7 @@ export class LeitoresService {
   constructor(private readonly _prisma: PrismaService) { }
 
   create(data: CreateLeitorDto) {
+    delete data?.id;
     return this._prisma.leitores.create({ data });
   }
 

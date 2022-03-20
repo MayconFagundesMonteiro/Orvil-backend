@@ -1,7 +1,10 @@
-import { IsNumber, IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsNumber, IsOptional, IsString } from "class-validator";
 import { Livro } from "../entities/livro.entity";
 
 export class CreateLivroDto extends Livro {
+    @IsBoolean()
+    alugado?: boolean;
+
     @IsString()
     capa: string;
 
