@@ -20,3 +20,12 @@ model Livros {
   edicao  Int?
   genero  String
 }
+
+model Leitores {
+  id       Int    @id @default(autoincrement())
+  nome     String
+  sexo     String
+  cidade   String
+  email    String @unique
+  telefone String
+}

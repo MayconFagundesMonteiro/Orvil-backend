@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateLivroDto } from './dto/create-livro.dto';
 import { UpdateLivroDto } from './dto/update-livro.dto';
-import { Livro } from './entities/livro.entity';
 
 @Injectable()
 export class LivrosService {
@@ -22,8 +21,10 @@ export class LivrosService {
     });
   }
 
-  update(id: number, data: UpdateLivroDto) {
+  async update(id: number, data: UpdateLivroDto) {
     delete data.id;
+    const query = await this._prisma.livros.findUnique({ where: { id } });
+    if (!query) return null;
     return this._prisma.livros.update({
       where: { id },
       data

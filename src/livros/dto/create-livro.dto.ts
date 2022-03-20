@@ -1,4 +1,4 @@
-import { IsDate, IsOptional, IsString } from "class-validator";
+import { IsNumber, IsOptional, IsString } from "class-validator";
 import { Livro } from "../entities/livro.entity";
 
 export class CreateLivroDto extends Livro {
@@ -15,11 +15,10 @@ export class CreateLivroDto extends Livro {
     @IsOptional()
     editora?: string;
 
-    @IsString()
-    @IsDate()
+    @IsNumber()
     ano: number;
 
-    @IsString()
+    @IsNumber()
     @IsOptional()
     edicao?: number;
 
