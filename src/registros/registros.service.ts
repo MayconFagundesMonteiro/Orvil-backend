@@ -35,7 +35,11 @@ export class RegistrosService {
   }
 
   findAll() {
-    return this._prisma.registros.findMany();
+    return this._prisma.registros.findMany({
+      where: {
+        ativo: true
+      }
+    });
   }
 
   findOne(id: number) {
@@ -78,9 +82,5 @@ export class RegistrosService {
     })
 
     return response;
-  }
-
-  remove(id: number) {
-    return this._prisma.registros.delete({ where: { id } });
   }
 }

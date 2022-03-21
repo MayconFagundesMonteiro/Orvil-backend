@@ -14,12 +14,27 @@ export class LivrosService {
   }
 
   findAll() {
-    return this._prisma.livros.findMany();
+    return this._prisma.livros.findMany({
+      where: {
+        excluido: false,
+        alugado: false
+      }
+    });
   }
 
   findOne(id: number) {
     return this._prisma.livros.findUnique({
       where: { id }
+    });
+  }
+
+  findByTitle(titulo: string) {
+    return this._prisma.livros.findMany({
+      where: {
+        titulo,
+        excluido: false,
+        alugado: false
+      }
     });
   }
 
@@ -34,9 +49,15 @@ export class LivrosService {
     });
   }
 
-  remove(id: number) {
-    return this._prisma.livros.delete({
-      where: { id }
+  async remove(id: number) {
+    const query = this._prisma.livros.findUnique({ where: { id } });
+    if (!query) return null;
+    return this._prisma.livros.update({
+      where: { id },
+      data: {
+        ...query,
+        excluido: true
+      }
     });
   }
 }
