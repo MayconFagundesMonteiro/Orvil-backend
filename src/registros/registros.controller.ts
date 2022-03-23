@@ -62,7 +62,7 @@ export class RegistrosController {
     return res.status(HttpStatus.OK).json(result);
   }
 
-  @Patch(':id')
+  @Patch(':id/:newDate')
   @ApiOperation({ summary: 'Atualiza um registro' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -76,12 +76,9 @@ export class RegistrosController {
     status: HttpStatus.NOT_FOUND,
     description: 'Informação não encontrada.',
   })
-  @ApiBody({
-    description: 'Payload para atualizar um registro',
-    type: CreateRegistroDto
-  })
-  async update(@Res() res: Response, @Param('id') id: string, @Body() updateRegistroDto: UpdateRegistroDto) {
-    const result = await this._registrosService.update(+id, updateRegistroDto);
+  async update(@Res() res: Response, @Param('id') id: string, @Param('newDate') newDate: string) {
+    if (!newDate) return res.status(HttpStatus.BAD_REQUEST).json({ message: "Informe a nova data." });
+    const result = await this._registrosService.updateDevulucao(+id, newDate);
     if (!result) return res.status(HttpStatus.NOT_FOUND).json();
     return res.status(HttpStatus.OK).json(result);
   }

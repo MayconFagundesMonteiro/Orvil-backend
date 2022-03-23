@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, HttpStatus, Res, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from "@nestjs/swagger";
 import { LivrosService } from './livros.service';
 import { CreateLivroDto } from './dto/create-livro.dto';
@@ -14,7 +14,7 @@ export class LivrosController {
   @ApiOperation({ summary: 'Cria um livro' })
   @ApiResponse({
     status: HttpStatus.CREATED,
-    description: 'Registro criado com sucesso.',
+    description: 'Livro criado com sucesso.',
   })
   @ApiBody({
     description: 'Payload para cria um novo livro',
@@ -22,6 +22,17 @@ export class LivrosController {
   })
   create(@Body() createLivroDto: CreateLivroDto) {
     return this._livrosService.create(createLivroDto);
+  }
+
+  @Get("alugados")
+  @ApiOperation({ summary: 'Obtem todos os livros alugados' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Lista de livros alugados',
+    isArray: true
+  })
+  findAllUnavailable() {
+    return this._livrosService.findAllUnavailable();
   }
 
   @Get()
@@ -33,6 +44,23 @@ export class LivrosController {
   })
   findAll() {
     return this._livrosService.findAll();
+  }
+
+  @Get("getbytitle?")
+  @ApiOperation({ summary: 'Obtem livros disponíveis por titulo' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Lista de livros disponíveis',
+    isArray: true
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Informe um titulo para busca',
+    isArray: true
+  })
+  @HttpCode(HttpStatus.OK)
+  findByTitle(@Query("title") title: string) {
+    return this._livrosService.findByTitle(title);
   }
 
   @Get(':id')
@@ -51,23 +79,11 @@ export class LivrosController {
     return res.status(HttpStatus.OK).json(result);
   }
 
-  @Get("getByTitle/:title")
-  @ApiOperation({ summary: 'Obtem livros disponíveis por titulo' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Lista de livros disponíveis',
-    isArray: true
-  })
-  @HttpCode(HttpStatus.OK)
-  findByTitle(@Param("title") title: string) {
-    return this._livrosService.findByTitle(title);
-  }
-
   @Patch(':id')
   @ApiOperation({ summary: 'Atualiza um livro' })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Registro atualziado com sucesso.',
+    description: 'Livro atualziado com sucesso.',
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
@@ -79,7 +95,7 @@ export class LivrosController {
   })
   async update(@Res() res: Response, @Param('id') id: string, @Body() updateLivroDto: UpdateLivroDto) {
     const result = await this._livrosService.update(+id, updateLivroDto);
-    if (!result) return res.status(HttpStatus.NOT_FOUND).json({ message: `O registro de id ${+id} não foi encontrado.` })
+    if (!result) return res.status(HttpStatus.NOT_FOUND).json({ message: `O Livro de id ${+id} não foi encontrado.` })
     return res.status(HttpStatus.OK).json(result);
   }
 

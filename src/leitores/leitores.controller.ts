@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, Res, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, Res, HttpCode, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from "@nestjs/swagger";
 import { LeitoresService } from './leitores.service';
 import { CreateLeitorDto } from './dto/create-leitor.dto';
@@ -35,6 +35,18 @@ export class LeitoresController {
     return this._leitoresService.findAll();
   }
 
+  @Get("getbyname?")
+  @ApiOperation({ summary: 'Obtem leitores por nome' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Lista de leitores cadastrados',
+    isArray: true
+  })
+  @HttpCode(HttpStatus.OK)
+  getByName(@Query("name") nome: string) {
+    return this._leitoresService.findByName(nome);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Obtem um leitor por id' })
   @ApiResponse({
@@ -50,18 +62,6 @@ export class LeitoresController {
     const result = await this._leitoresService.findOne(+id);
     if (!result) return res.status(HttpStatus.NOT_FOUND).json();
     return res.status(HttpStatus.OK).json(result);
-  }
-
-  @Get("getByName/:name")
-  @ApiOperation({ summary: 'Obtem leitores por nome' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Lista de leitores cadastrados',
-    isArray: true
-  })
-  @HttpCode(HttpStatus.OK)
-  getByName(@Param("name") nome: string) {
-    return this._leitoresService.findByName(nome);
   }
 
   @Patch(':id')
@@ -95,7 +95,7 @@ export class LeitoresController {
     description: 'Leitor não encontrado',
   })
   async remove(@Res() res: Response, @Param('id') id: string) {
-    const result = this._leitoresService.remove(+id);
+    const result = await this._leitoresService.remove(+id);
     if (!result) return res.status(HttpStatus.NOT_FOUND).json();
     return res.status(HttpStatus.NO_CONTENT).json();
   }

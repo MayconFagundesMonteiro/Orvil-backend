@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateRegistroDto } from './dto/create-registro.dto';
-import { UpdateRegistroDto } from './dto/update-registro.dto';
 
 @Injectable()
 export class RegistrosService {
@@ -9,6 +8,7 @@ export class RegistrosService {
 
   async create(data: CreateRegistroDto) {
     delete data?.id;
+    data.ativo = true;
     let queryLivro = await this._prisma.livros.findUnique({ where: { id: data.livroId } });
     let queryLeitor = await this._prisma.leitores.findUnique({ where: { id: data.leitorId } });
     if (!queryLivro) return `O livro de id '${data.livroId}' não foi encontrado`;
@@ -20,6 +20,10 @@ export class RegistrosService {
         ...data,
         dataEmprestimo: new Date(data.dataEmprestimo),
         dataDevolucao: new Date(data.dataDevolucao)
+      },
+      include: {
+        leitor: true,
+        livro: true
       }
     });
 
@@ -37,25 +41,37 @@ export class RegistrosService {
   findAll() {
     return this._prisma.registros.findMany({
       where: {
-        ativo: true
+        ativo: true,
+      },
+      include: {
+        leitor: true,
+        livro: true
       }
     });
   }
 
   findOne(id: number) {
-    return this._prisma.registros.findUnique({ where: { id } });
+    return this._prisma.registros.findFirst({
+      where: { id, ativo: true },
+      include: {
+        leitor: true,
+        livro: true
+      }
+    });
   }
 
-  async update(id: number, data: UpdateRegistroDto) {
-    delete data?.id;
+  async updateDevulucao(id: number, date: string) {
     const query = await this._prisma.registros.findUnique({ where: { id } });
     if (!query) return null;
     return this._prisma.registros.update({
       where: { id },
       data: {
-        ...data,
-        dataEmprestimo: data.dataEmprestimo ? new Date(data.dataEmprestimo) : query.dataEmprestimo,
-        dataDevolucao: data.dataDevolucao ? new Date(data.dataDevolucao) : query.dataDevolucao
+        ...query,
+        dataDevolucao: new Date(date)
+      },
+      include: {
+        leitor: true,
+        livro: true
       }
     });
   }
@@ -70,6 +86,10 @@ export class RegistrosService {
       data: {
         ...registro,
         ativo: false
+      },
+      include: {
+        leitor: true,
+        livro: true
       }
     });
 
